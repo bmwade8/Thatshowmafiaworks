@@ -1,4 +1,3 @@
-
 import discord
 import random
 
@@ -11,10 +10,8 @@ client = Bot(command_prefix=BOT_PREFIX)
 
 
 @client.event
-async def init_level(member):
-    before = member
-    await discord.on_member_update(before, after)
-    client.change_nickname(member, "Lvl. 1 " + before.nick)
+async def on_member_update(before, after):
+    await client.change_nickname(after, None)
 
 
 @client.command(pass_context=True,
@@ -27,6 +24,8 @@ async def russian_roulette(context):
         " was their own worst enemy",
         " flew too close to the sun"
     ]
+    if context.message.author == client.user:
+        return;
     shot = random.randint(1, 6)
     if shot == 6:
         await client.say(context.message.author.mention +
