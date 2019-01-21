@@ -24,6 +24,22 @@ async def on_member_update(before, after):
 
 
 @client.command(pass_context=True,
+                name='changenickname',
+                aliases=['changenick', 'change_nick', 'change_nickname'])
+async def change_nickname(context, after):
+    author = context.message.author
+    owner = context.message.server.owner
+    if author == client.user or author == context.message.server.owner:
+        return
+    elif after.startswith("Lvl 1"):
+        client.say(author.mention + ", This nickname is invalid.")
+    elif author == owner:
+        client.say(author.mention + ", a bot does not have permission to " +
+                   "change a server owner's nickname.")
+
+
+
+@client.command(pass_context=True,
                 name="russianroulette",
                 aliases=["rr", "russian_roulette", "russian"])
 async def russian_roulette(context):
