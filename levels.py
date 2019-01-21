@@ -11,7 +11,16 @@ client = Bot(command_prefix=BOT_PREFIX)
 
 @client.event
 async def on_member_update(before, after):
-    await client.change_nickname(after, None)
+    if after.nick == None:
+        new_nick = "Lvl 1 " + after.name
+    elif not after.nick.startswith("Lvl 1 "):
+        new_nick = "Lvl 1 " + after.nick
+    else:
+        new_nick = after.nick
+    # bot can never have permissions above server owner, so it can't change
+    # an owner's nickname
+    if before.server.owner != before:
+        await client.change_nickname(after, new_nick)
 
 
 @client.command(pass_context=True,
