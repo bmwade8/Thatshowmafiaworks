@@ -12,42 +12,60 @@ client = Bot(command_prefix=BOT_PREFIX)
 toons = {}
 
 
-# TODO: UNTESTED
+@client.event
+async def on_ready():
+    for server in client.servers:
+        for member in server.members:
+            if member == server.owner or member == client.user:
+                continue
+            elif not member.nick:
+                new_char = Character(member.name)
+                toons[member] = new_char
+                await client.change_nickname(member, toons[member].nick)
+            elif member not in toons:
+                new_char = Character(member.name)
+                toons[member] = new_char
+                await client.change_nickname(member, toons[member].nick)
+
+
 @client.event
 async def on_member_join(member):
-    new_char = Character(member)
+    new_char = Character(member.name)
     toons[member] = new_char
-    await client.change_nickname(member, new_char.level_tag + member.name)
+    await client.change_nickname(member, toons[member].nick)
 
-# TODO: UNTESTED
+
 @client.event
 async def on_member_remove(member):
-    temp_toon = toons[member]
-    del toons[member]
+    temp_toon = toons.pop(member, None)
     del temp_toon
-    await client.say("Another one bites the dust")
 
 
-# TODO: still raises an error when passed an empty string
 @client.command(pass_context=True,
                 name='changenickname',
                 aliases=['changenick', 'change_nick', 'change_nickname'])
-async def change_nickname(context, nick):
+async def change_nickname(context, *args):
     author = context.message.author
     owner = context.message.server.owner
+    if not args:
+        await client.say(author.mention + ", You Must pass in a nickname")
     if author == client.user:
         return
-    elif nick.startswith("Lvl 1"):
+    elif args[0].startswith("Lvl") or args[0].startswith("lvl"):
         await client.say(author.mention + ", This nickname is invalid.")
     elif author == owner:
         await client.say(author.mention + ", a bot does not have permission " +
                          "to change a server owner's nickname.")
     else:
-        await client.change_nickname(context.message.author, nick)
-        await client.say(author.mention + "your nickname is now: " + nick)
+        full_nick = ""
+        for arg in args:
+            full_nick += arg + ' '
+        toons[author].update_nick(full_nick)
+        await client.change_nickname(context.message.author, toons[author].nick)
+        await client.say(author.mention + " Your nickname is now: " +
+                         toons[author].nick)
 
 
-# TODO: Add character functionality
 @client.command(pass_context=True,
                 name="russianroulette",
                 aliases=["rr", "russian_roulette", "russian"])
@@ -63,8 +81,12 @@ async def russian_roulette(context):
     if author == client.user:
         return;
     if random.randint(1, 6) == 6:
+        toons[author].update_level(-20)
+        await client.change_nickname(author, toons[author].nick)
         await client.say(author.mention + random.choice(possible_responses))
     else:
+        toons[author].update_level(3)
+        await client.change_nickname(author, toons[author].nick)
         await client.say(author.mention + " gained 3 levels.")
 
 
