@@ -2,21 +2,25 @@ class Character:
     """ A representation of a user's progression through levels. Each member
     will have a character object attached to it. """
 
-    titles = ['Crook', 'Soldiers', 'Capo', 'Underboss', 'Mafia Boss',
+    titles = ['Crook', 'Soldier', 'Capo', 'Underboss', 'Mafia Boss',
               'Head Mafia Boss']
 
-    def __init__(self, name):
-        self.level = 1
+    def __init__(self, name, lvl):
+        self.level = lvl
         self.meta_level = self.titles[0]
-        self.nick = "Lvl 1 " + name
+        self.tag = "Lvl " + str(self.level) + " "
+        self.nick = name
+        self.tag_nick = self.tag + self.nick
+
+    def update_tag_nick(self):
+        self.tag_nick = self.tag + self.nick
 
     def update_level(self, delta):
-        if (self.level + delta) < 1:
-            self.level = 1
-        else:
-            self.level += delta
+        self.level = max(1, self.level + delta)
         self.meta_level = self.titles[int(self.level / 20)]
-        self.update_nick(self.nick[6:])
+        self.tag = "Lvl " + str(self.level) + " "
+        self.update_tag_nick()
 
     def update_nick(self, nickname):
-        self.nick = "Lvl " + str(self.level) + " " + nickname
+        self.nick = nickname
+        self.update_tag_nick()
