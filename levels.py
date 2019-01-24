@@ -1,4 +1,5 @@
 from character import Character
+from pewdiepie import *
 from discord.ext.commands import Bot
 
 import discord
@@ -19,16 +20,24 @@ possible_responses = [
 ]
 
 
+@client.command(aliases=['pgay', 'pewdssubs', 'pewds'])
+async def pewdiepie():
+    sub_count = get_pewdiepie_subs()
+    await client.say("Pewdiepie's sub count is: " + sub_count)
+
+
 def is_parse(nickname):
         tag_nick = nickname.split(" ")
         if len(tag_nick) < 3:
             return False
-        if tag_nick[0] == 'Lvl' or tag_nick[0] == 'lvl':
+        elif tag_nick[0] == 'Lvl':
             try:
                 int(tag_nick[1])
                 return True
             except ValueError:
                 return False
+        else:
+            return False
 
 
 @client.event
