@@ -6,7 +6,8 @@ class Character:
               'Head Mafia Boss']
 
     def __init__(self, name, lvl):
-        self.level = lvl
+        # python interprets level as a string, so I'm typecasting for now
+        self.level = int(lvl)
         self.meta_level = self.titles[0]
         self.tag = "Lvl " + str(self.level) + " "
         self.nick = name
@@ -17,6 +18,7 @@ class Character:
 
     def update_level(self, delta):
         self.level = max(1, self.level + delta)
+        self.level = min(100, self.level)
         self.meta_level = self.titles[int(self.level / 20)]
         self.tag = "Lvl " + str(self.level) + " "
         self.update_tag_nick()

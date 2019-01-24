@@ -20,6 +20,7 @@ possible_responses = [
 ]
 
 
+# TODO: Fix the implementation in pewdiepie file
 @client.command(aliases=['pgay', 'pewdssubs', 'pewds'])
 async def pewdiepie():
     sub_count = get_pewdiepie_subs()
@@ -27,19 +28,23 @@ async def pewdiepie():
 
 
 def is_parse(nickname):
-        tag_nick = nickname.split(" ")
-        if len(tag_nick) < 3:
+    if not nickname:
+        return False
+
+    tag_nick = nickname.split(" ")
+    if len(tag_nick) < 3:
+        return False
+    elif tag_nick[0] == 'Lvl':
+        try:
+            int(tag_nick[1])
+            return True
+        except ValueError:
             return False
-        elif tag_nick[0] == 'Lvl':
-            try:
-                int(tag_nick[1])
-                return True
-            except ValueError:
-                return False
-        else:
-            return False
+    else:
+        return False
 
 
+# TODO: Address names longer than 24 characters
 @client.event
 async def on_ready():
     for server in client.servers:
@@ -47,15 +52,19 @@ async def on_ready():
             if member == server.owner or member == client.user:
                 continue
             elif member not in toons:
-                new_char = Character(member.name, 1)
-                toons[member] = new_char
+                if is_parse(member.nick):
+                    tag_nick = member.nick.split(" ")
+                    full_nick = " ".join(tag_nick[2:])
+                    toons[member] = Character(full_nick, tag_nick[1])
+                else:
+                    toons[member] = Character(member.name, 1)
                 await client.change_nickname(member, toons[member].tag_nick)
 
 
+# TODO: Address names longer than 24 characters
 @client.event
 async def on_member_join(member):
-    new_char = Character(member.name, 1)
-    toons[member] = new_char
+    toons[member] = Character(member.name, 1)
     await client.change_nickname(member, toons[member].tag_nick)
 
 
@@ -71,7 +80,6 @@ def valid_user(context):
                 context.message.author == context.message.server.owner)
 
 
-# TODO: Address the character limit for nicknames on discord
 @client.command(pass_context=True,
                 name='changenickname',
                 aliases=['changenick', 'change_nick', 'change_nickname'])
@@ -84,6 +92,8 @@ async def change_nickname(context, *args):
         await client.say(author.mention + ", You Must pass in a nickname")
     elif args[0].startswith("Lvl") or args[0].startswith("lvl"):
         await client.say(author.mention + ", This nickname is invalid.")
+    elif len(''.join(args)) > 24:  # 'Lvl [1-100] [...]' takes up max of 8 chars
+        await client.say(author.mention + ", This nickname is too long")
     else:
         full_nick = " ".join(args)
         toons[author].update_nick(full_nick)
