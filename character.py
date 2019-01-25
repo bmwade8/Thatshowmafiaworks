@@ -17,8 +17,7 @@ class Character:
         self.tag_nick = self.tag + self.nick
 
     def update_level(self, delta):
-        self.level = max(1, self.level + delta)
-        self.level = min(100, self.level)
+        self.level = min(100, max(1, self.level + delta))
         self.meta_level = self.titles[int(self.level / 20)]
         self.tag = "Lvl " + str(self.level) + " "
         self.update_tag_nick()

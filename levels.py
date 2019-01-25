@@ -44,10 +44,16 @@ def is_parse(nickname):
         return False
 
 
-# TODO: Address names longer than 24 characters
+# TODO: Check if Role already exists
+# I probably want to move a lot of this to on_server_join....I need to think
+# the consequences of that, though
 @client.event
 async def on_ready():
     for server in client.servers:
+        perms = discord.Permissions(permissions=68608)
+        role_crook = await client.create_role(server, name='Crooks',
+                                              permissions=perms,
+                                              color=discord.Color.red())
         for member in server.members:
             if member == server.owner or member == client.user:
                 continue
@@ -57,14 +63,19 @@ async def on_ready():
                     full_nick = " ".join(tag_nick[2:])
                     toons[member] = Character(full_nick, tag_nick[1])
                 else:
-                    toons[member] = Character(member.name, 1)
+                    nickname = "Name" if len(member.name) > 24 else member.name
+                    toons[member] = Character(nickname, 1)
                 await client.change_nickname(member, toons[member].tag_nick)
+            if member in toons and toons[member].level <= 20:
+                await client.add_roles(member, role_crook)
 
 
-# TODO: Address names longer than 24 characters
+
+
 @client.event
 async def on_member_join(member):
-    toons[member] = Character(member.name, 1)
+    nickname = "Name" if len(member.name) > 24 else member.name
+    toons[member] = Character(nickname, 1)
     await client.change_nickname(member, toons[member].tag_nick)
 
 
