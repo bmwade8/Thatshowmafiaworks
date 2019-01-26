@@ -53,7 +53,8 @@ async def on_ready():
         perms = discord.Permissions(permissions=68608)
         role_crook = await client.create_role(server, name='Crooks',
                                               permissions=perms,
-                                              color=discord.Color.red())
+                                              color=discord.Color.red(),
+                                              hoist=True)
         for member in server.members:
             if member == server.owner or member == client.user:
                 continue
