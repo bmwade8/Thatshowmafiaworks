@@ -53,7 +53,7 @@ A death happens 1/6 of the time.
 
 
 ## License
-This project is licensed under the MIT License. see the [License.md](LICENSE.md)
+This project is licensed under the MIT License. see the [License.md](LICENSE)
 file for more details
 
 
