@@ -7,7 +7,7 @@ import random
 
 
 BOT_PREFIX = '+'
-TOKEN = 'NTM1MzI0NTI5NTUyMTMwMDUw.DyU5qw.bm9vNkgcLMl0L0EuSh0qzsgKwmY'
+TOKEN = 'NTM1MzI0NTI5NTUyMTMwMDUw.Dy5x0w.oQp2eNxw02QT9P9uqE85iWdzNJw'
 
 client = Bot(command_prefix=BOT_PREFIX)
 toons = {}
@@ -27,6 +27,48 @@ async def pewdiepie():
     await client.say("Pewdiepie's sub count is: " + sub_count)
 
 
+async def sort_members(server, role_list):
+    for member in server.members:
+        if member == server.owner or member == client.user:
+            continue
+        assert toons[member].level <= 100
+        role = role_list[int(toons[member].level / 20)]
+        await client.add_roles(member, role)
+
+
+async def add_mafia_roles(server):
+    crook_perms = discord.Permissions(permissions=68608)
+    soldier_perms = discord.Permissions(permissions=1121280)
+    capo_perms = discord.Permissions(permissions=3480640)
+    underboss_perms = discord.Permissions(permissions=37084224)
+    mafia_boss_perms = discord.Permissions(permissions=49798209)
+
+    role_crook = await client.create_role(server, name='Crooks',
+                                          permissions=crook_perms,
+                                          color=discord.Color.red(),
+                                          hoist=True)
+    role_soldier = await client.create_role(server, name='Soldiers',
+                                            permissions=soldier_perms,
+                                            color=discord.Color.orange(),
+                                            hoist=True)
+    role_capo = await client.create_role(server, name='Capos',
+                                         permissions=capo_perms,
+                                         color=discord.Color.gold(),
+                                         hoist=True)
+    role_underboss = await client.create_role(server, name='Underbosses',
+                                              permissions=underboss_perms,
+                                              color=discord.Color.magenta())
+    role_mafia_boss = await client.create_role(server, name='Mafia Bosses',
+                                               permissions=mafia_boss_perms,
+                                               color=discord.Color.purple())
+    role_100 = await client.create_role(server, name='Head Mafia Bosses',
+                                        permissions=mafia_boss_perms,
+                                        color=discord.Color.blue())
+
+    await sort_members(server, [role_crook, role_soldier, role_capo,
+                                role_underboss, role_mafia_boss, role_100])
+
+
 def is_parse(nickname):
     if not nickname:
         return False
@@ -44,17 +86,29 @@ def is_parse(nickname):
         return False
 
 
+@client.event
+async def on_server_join(server):
+    for member in server.members:
+        if member == server.owner or member == client.user:
+            continue
+        elif member not in toons:
+            if is_parse(member.nick):
+                tag_nick = member.nick.split(" ")
+                full_nick = " ".join(tag_nick[2:])
+                toons[member] = Character(full_nick, tag_nick[1])
+            else:
+                nickname = "Name" if len(member.name) > 24 else member.name
+                toons[member] = Character(nickname, 1)
+            await client.change_nickname(member, toons[member].tag_nick)
+    await add_mafia_roles(server)
+
+
 # TODO: Check if Role already exists
 # I probably want to move a lot of this to on_server_join....I need to think
 # the consequences of that, though
 @client.event
 async def on_ready():
     for server in client.servers:
-        perms = discord.Permissions(permissions=68608)
-        role_crook = await client.create_role(server, name='Crooks',
-                                              permissions=perms,
-                                              color=discord.Color.red(),
-                                              hoist=True)
         for member in server.members:
             if member == server.owner or member == client.user:
                 continue
@@ -67,8 +121,7 @@ async def on_ready():
                     nickname = "Name" if len(member.name) > 24 else member.name
                     toons[member] = Character(nickname, 1)
                 await client.change_nickname(member, toons[member].tag_nick)
-            if member in toons and toons[member].level <= 20:
-                await client.add_roles(member, role_crook)
+        await add_mafia_roles(server)
 
 
 
