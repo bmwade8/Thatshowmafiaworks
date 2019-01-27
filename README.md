@@ -38,12 +38,23 @@ respond to commands with the '+' prefix:
 ### Examples
 
 #### Russian Roulette
-This command will either randomly kill (-20 levels) the author who issued the 
-command, or grant the author 3 levels. A death happens 1/6 of the time.
+This command will randomly kill (-20 levels) the author who issued the 
+command: 
+
+![fail attempt](https://i.gyazo.com/1d53950b896b34022788bd4f0c773cb0.png 
+"Better Luck Next Time")
+
+or grant the author 3 levels: 
 
 ![success attempt](https://i.gyazo.com/f5a7f4ab50eaeefb0e8c7f19bf5739e7.png 
 "Successful")
 
-![fail attempt](https://i.gyazo.com/1d53950b896b34022788bd4f0c773cb0.png 
-"Better Luck Next Time")
+A death happens 1/6 of the time.
+
+
+## License
+This project is licensed under the MIT License. see the [License.md](LICENSE.md)
+file for more details
+
+
 
