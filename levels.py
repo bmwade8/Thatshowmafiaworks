@@ -1,15 +1,17 @@
 from character import Character
 from pewdiepie import *
-from discord.ext.commands import Bot
 
+# Protected API Key
+from config import TOKEN
+
+from discord.ext.commands import Bot
 import discord
 import random
 
 
 BOT_PREFIX = '+'
-TOKEN = 'NTM1MzI0NTI5NTUyMTMwMDUw.Dy5x0w.oQp2eNxw02QT9P9uqE85iWdzNJw'
-
 client = Bot(command_prefix=BOT_PREFIX)
+
 toons = {}
 
 possible_responses = [
@@ -37,36 +39,25 @@ async def sort_members(server, role_list):
 
 
 async def add_mafia_roles(server):
-    crook_perms = discord.Permissions(permissions=68608)
-    soldier_perms = discord.Permissions(permissions=1121280)
-    capo_perms = discord.Permissions(permissions=3480640)
-    underboss_perms = discord.Permissions(permissions=37084224)
-    mafia_boss_perms = discord.Permissions(permissions=49798209)
+    # temporary lists used to organize role creation
+    perms_list = [68608, 1121280, 3480640, 37084224, 49798209]
+    role_list = [discord.Color.red(), discord.Color.orange(),
+                 discord.Color.gold(), discord.Color.magenta(),
+                 discord.Color.purple()]
 
-    role_crook = await client.create_role(server, name='Crooks',
-                                          permissions=crook_perms,
-                                          color=discord.Color.red(),
-                                          hoist=True)
-    role_soldier = await client.create_role(server, name='Soldiers',
-                                            permissions=soldier_perms,
-                                            color=discord.Color.orange(),
-                                            hoist=True)
-    role_capo = await client.create_role(server, name='Capos',
-                                         permissions=capo_perms,
-                                         color=discord.Color.gold(),
-                                         hoist=True)
-    role_underboss = await client.create_role(server, name='Underbosses',
-                                              permissions=underboss_perms,
-                                              color=discord.Color.magenta())
-    role_mafia_boss = await client.create_role(server, name='Mafia Bosses',
-                                               permissions=mafia_boss_perms,
-                                               color=discord.Color.purple())
+    for i in range(5):
+        perms_list[i] = discord.Permissions(permissions=perms_list[i])
+        role_list[i] = await client.create_role(server,
+                                                name=Character.titles[i],
+                                                permissions=perms_list[i],
+                                                color=role_list[i],
+                                                hoist=True)
+
     role_100 = await client.create_role(server, name='Head Mafia Bosses',
-                                        permissions=mafia_boss_perms,
+                                        permissions=perms_list[4],
                                         color=discord.Color.blue())
-
-    await sort_members(server, [role_crook, role_soldier, role_capo,
-                                role_underboss, role_mafia_boss, role_100])
+    role_list.append(role_100)
+    await sort_members(server, role_list)
 
 
 def is_parse(nickname):
