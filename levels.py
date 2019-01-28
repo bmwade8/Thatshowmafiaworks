@@ -5,6 +5,7 @@ from pewdiepie import *
 from config import TOKEN
 
 from discord.ext.commands import Bot
+from discord.utils import get
 import discord
 import random
 
@@ -22,11 +23,16 @@ possible_responses = [
 ]
 
 
-# TODO: Fix the implementation in pewdiepie file
 @client.command(aliases=['pgay', 'pewdssubs', 'pewds'])
 async def pewdiepie():
     sub_count = get_pewdiepie_subs()
     await client.say("Pewdiepie's sub count is: " + sub_count)
+
+
+async def change_member_role(member):
+    updated_role = get(member.server.roles, name=toons[member].meta_level)
+    assert updated_role is not None
+    await client.replace_roles(member, updated_role)
 
 
 async def sort_members(server, role_list):
@@ -40,23 +46,22 @@ async def sort_members(server, role_list):
 
 async def add_mafia_roles(server):
     # temporary lists used to organize role creation
-    perms_list = [68608, 1121280, 3480640, 37084224, 49798209]
+    perms_list = [68608, 1121280, 3480640, 37084224, 49798209, 49798209]
     role_list = [discord.Color.red(), discord.Color.orange(),
                  discord.Color.gold(), discord.Color.magenta(),
-                 discord.Color.purple()]
+                 discord.Color.purple(), discord.Color.blue()]
 
-    for i in range(5):
+    for i in range(6):
         perms_list[i] = discord.Permissions(permissions=perms_list[i])
-        role_list[i] = await client.create_role(server,
-                                                name=Character.titles[i],
-                                                permissions=perms_list[i],
-                                                color=role_list[i],
-                                                hoist=True)
-
-    role_100 = await client.create_role(server, name='Head Mafia Bosses',
-                                        permissions=perms_list[4],
-                                        color=discord.Color.blue())
-    role_list.append(role_100)
+        existing_role = get(server.roles, name=Character.titles[i])
+        if existing_role is None:
+            role_list[i] = await client.create_role(server,
+                                                    name=Character.titles[i],
+                                                    permissions=perms_list[i],
+                                                    color=role_list[i],
+                                                    hoist=True)
+        else:
+            role_list[i] = existing_role
     await sort_members(server, role_list)
 
 
@@ -122,6 +127,7 @@ async def on_member_join(member):
     nickname = "Name" if len(member.name) > 24 else member.name
     toons[member] = Character(nickname, 1)
     await client.change_nickname(member, toons[member].tag_nick)
+    await change_member_role(member)
 
 
 @client.event
@@ -163,14 +169,18 @@ async def change_nickname(context, *args):
                 name="russianroulette",
                 aliases=["rr", "russian_roulette", "russian"])
 async def russian_roulette(context):
+    author = context.message.author
     if not valid_user(context):
         return
-    author = context.message.author
+    old_title = toons[author].meta_level
 
-    delta = -20 if random.randint(1, 6) == 6 else 3
+    # update character and server with new information
+    delta = -10 if random.randint(1, 6) == 6 else 5
     toons[author].update_level(delta)
-    await client.change_nickname(author, toons[author].tag_nick)
+    if toons[author].meta_level != old_title:
+        await change_member_role(author)
 
+    await client.change_nickname(author, toons[author].tag_nick)
     if delta == -20:
         await client.say(author.mention + random.choice(possible_responses))
     else:

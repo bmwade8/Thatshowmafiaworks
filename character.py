@@ -8,7 +8,7 @@ class Character:
     def __init__(self, name, lvl):
         # python interprets level as a string, so I'm typecasting for now
         self.level = int(lvl)
-        self.meta_level = self.titles[0]
+        self.meta_level = self.titles[int(self.level / 20)]
         self.tag = "Lvl " + str(self.level) + " "
         self.nick = name
         self.tag_nick = self.tag + self.nick

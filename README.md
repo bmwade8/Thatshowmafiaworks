@@ -3,20 +3,24 @@ This is a project showcasing the leveling idea within a discord server. Players
 will earn levels that will be reflected within their nickname in the server.
 
 ## Getting Started
-To run this on a local machine, clone it in a local repository with the 
-following prerequisites:
+To run this on a local machine, simply invite the bot to a discord server and
+run one of the commands listed below. If you already have a discord server you
+can use, 
+[Click here to add the bot to the server](https://discordapp.com/oauth2/authorize?client_id=535324529552130050&scope=bot&permissions=8).
+
+**Note: This link gives the Bot admin privileges in your server, so make sure 
+you know what you're doing.**
+
+Otherwise, you're going to want to take a look at the prerequisites listed below.
 
 ### Prerequisites
 This bot requires a previous understanding of the Discord client, and it
 requires the ability to add a bot to a server. I won't get into it here, but you
-download the discord client on [Discord's Homepage](https://discordapp.com/).
+can create an account and download the discord client on 
+[Discord's Homepage](https://discordapp.com/).
 
-You can add the Bot to your Discord Server with the following link:
-https://discordapp.com/oauth2/authorize?client_id=535324529552130050&scope=bot&permissions=8
-(You'll need invite privileges to add the Bot to a server.)
-
-**Note: This link gives the Bot admin privileges in your server, so make sure 
-you know what you're doing.**
+Once your discord client is set up, You can create a brand new server and follow
+the link listed above in order to add the bot to the server.
 
 ### Installation
 This project utilizes the Discord API, along with BeautifulSoup4; You can
@@ -34,6 +38,14 @@ for BeautifulSoup4.
 This bot should dynamically respond to events within the server itself, such as 
 new members joining the server, or members gaining levels. It should also
 respond to commands with the '+' prefix:
+
+There is a big exception when it comes to what the bot can do. Namely, most
+of the functionality of the bot does not apply to server owners. This is because
+server owners have the highest permissions within their server. A bot can 
+therefore never overwrite a server owner's nickname or role. You can very easily
+see why this interferes with the bot's functionality. If this is an issue for
+you, I recommend adding a 3rd member, such as a friend or an alternate account,
+to the server, and testing the bot through this new 3rd member.
 
 ### Examples
 
@@ -53,7 +65,7 @@ A death happens 1/6 of the time.
 
 
 ## License
-This project is licensed under the MIT License. see the [License.md](LICENSE)
+This project is licensed under the MIT License. see the [LICENSE.md](LICENSE)
 file for more details
 
 
