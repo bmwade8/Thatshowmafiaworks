@@ -1,8 +1,8 @@
-from character import Character
-from pewdiepie import *
+from src.character import Character
+from src.pewdiepie import *
 
 # Protected API Key
-from config import TOKEN
+from src.config import TOKEN
 
 from discord.ext.commands import Bot
 from discord.utils import get
@@ -82,8 +82,7 @@ def is_parse(nickname):
         return False
 
 
-@client.event
-async def on_server_join(server):
+async def create_characters(server):
     for member in server.members:
         if member == server.owner or member == client.user:
             continue
@@ -96,30 +95,19 @@ async def on_server_join(server):
                 nickname = "Name" if len(member.name) > 24 else member.name
                 toons[member] = Character(nickname, 1)
             await client.change_nickname(member, toons[member].tag_nick)
+
+
+@client.event
+async def on_server_join(server):
+    await create_characters(server)
     await add_mafia_roles(server)
 
 
-# TODO: Check if Role already exists
-# I probably want to move a lot of this to on_server_join....I need to think
-# the consequences of that, though
 @client.event
 async def on_ready():
     for server in client.servers:
-        for member in server.members:
-            if member == server.owner or member == client.user:
-                continue
-            elif member not in toons:
-                if is_parse(member.nick):
-                    tag_nick = member.nick.split(" ")
-                    full_nick = " ".join(tag_nick[2:])
-                    toons[member] = Character(full_nick, tag_nick[1])
-                else:
-                    nickname = "Name" if len(member.name) > 24 else member.name
-                    toons[member] = Character(nickname, 1)
-                await client.change_nickname(member, toons[member].tag_nick)
+        await create_characters(server)
         await add_mafia_roles(server)
-
-
 
 
 @client.event
@@ -175,7 +163,7 @@ async def russian_roulette(context):
     old_title = toons[author].meta_level
 
     # update character and server with new information
-    delta = -10 if random.randint(1, 6) == 6 else 5
+    delta = -20 if random.randint(1, 6) == 6 else 3
     toons[author].update_level(delta)
     if toons[author].meta_level != old_title:
         await change_member_role(author)
