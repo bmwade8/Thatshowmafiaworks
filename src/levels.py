@@ -23,12 +23,6 @@ possible_responses = [
 ]
 
 
-@client.command(aliases=['pgay', 'pewdssubs', 'pewds'])
-async def pewdiepie():
-    sub_count = get_pewdiepie_subs()
-    await client.say("Pewdiepie's sub count is: " + sub_count)
-
-
 async def change_member_role(member):
     updated_role = get(member.server.roles, name=toons[member].meta_level)
     assert updated_role is not None
@@ -174,5 +168,10 @@ async def russian_roulette(context):
     else:
         await client.say(author.mention + " gained 3 levels.")
 
+
+@client.command(aliases=['pewdssubs', 'pewds'])
+async def pewdiepie():
+    sub_count = get_pewdiepie_subs()
+    await client.say("Pewdiepie's sub count is: " + sub_count)
 
 client.run(TOKEN)
