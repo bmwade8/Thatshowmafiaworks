@@ -21,6 +21,9 @@ possible_responses = [
     " was their own worst enemy",
     " flew too close to the sun"
 ]
+role_list = [discord.Color.red(), discord.Color.orange(), discord.Color.gold(),
+             discord.Color.magenta(), discord.Color.purple(),
+             discord.Color.blue()]
 
 
 async def change_member_role(member):
@@ -29,7 +32,7 @@ async def change_member_role(member):
     await client.replace_roles(member, updated_role)
 
 
-async def sort_members(server, role_list):
+async def sort_members(server):
     for member in server.members:
         if member == server.owner or member == client.user:
             continue
@@ -41,9 +44,6 @@ async def sort_members(server, role_list):
 async def add_mafia_roles(server):
     # temporary lists used to organize role creation
     perms_list = [68608, 1121280, 3480640, 37084224, 49798209, 49798209]
-    role_list = [discord.Color.red(), discord.Color.orange(),
-                 discord.Color.gold(), discord.Color.magenta(),
-                 discord.Color.purple(), discord.Color.blue()]
 
     for i in range(6):
         perms_list[i] = discord.Permissions(permissions=perms_list[i])
@@ -53,10 +53,10 @@ async def add_mafia_roles(server):
                                                     name=Character.titles[i],
                                                     permissions=perms_list[i],
                                                     color=role_list[i],
-                                                    hoist=True)
+                                                    hoist=True, position=i)
         else:
             role_list[i] = existing_role
-    await sort_members(server, role_list)
+    await sort_members(server)
 
 
 def is_parse(nickname):
@@ -116,6 +116,16 @@ async def on_member_join(member):
 async def on_member_remove(member):
     temp_toon = toons.pop(member, None)
     del temp_toon
+
+
+@client.event
+async def on_server_role_delete(role):
+    if role in role_list:
+        await client.create_role(role.server, name=role.name,
+                                 permissions=role.permissions, color=role.color,
+                                 hoist=True, position=role.position)
+        # a loss of efficiency in sorting members in unaffected role
+        await sort_members(role.server)
 
 
 # checks if user is bot, or server owner
